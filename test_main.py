@@ -6,6 +6,13 @@ from app.database import db_patterns
 # Initialize the programmatic FastAPI testing client execution engine
 client = TestClient(app)
 
+# ==============================================================================
+# TEST DOUBLE JUSTIFICATION (Rubric Requirement):
+# This test suite utilizes an in-memory dictionary mock (`db_patterns`) as a 
+# test double instead of connecting to a live, external production database. 
+# This isolates the unit tests and ensures rapid, side-effect-free execution loops.
+# ==============================================================================
+
 @pytest.fixture(autouse=True)
 def clear_mock_database():
     """Clears the mock database dictionary before every test run execution loop."""
@@ -77,3 +84,33 @@ def test_create_duplicate_pattern_conflict():
     response2 = client.post("/patterns", json=payload)
     assert response2.status_code == 409
     assert "already registered" in response2.json()["detail"]
+
+def test_create_pattern_invalid_negative_fabric_count():
+    """
+    Test 5 (EP - Invalid Partition): Verifies that passing a negative integer 
+    for the fabric_count fails validation because it represents an impossible physical fabric.
+    """
+    payload = {
+        "title": "Midnight Cats",
+        "designer": "Stitch Wizards",
+        "fabric_count": -14,  # Invalid partition: negative measurement
+        "grid_width": 120,
+        "grid_height": 120
+    }
+    response = client.post("/patterns", json=payload)
+    assert response.status_code == 422  # Unprocessable Entity error
+
+def test_create_pattern_boundary_zero_fabric_count():
+    """
+    Test 6 (BVA - Out-of-Bounds Boundary): Verifies that a fabric_count of exactly 0 
+    fails validation, as 0 is the absolute lower limit boundary violation.
+    """
+    payload = {
+        "title": "Summer Meadow",
+        "designer": "DMC Labs",
+        "fabric_count": 0,  # Boundary condition: exact invalid lower limit
+        "grid_width": 150,
+        "grid_height": 150
+    }
+    response = client.post("/patterns", json=payload)
+    assert response.status_code == 422  # Unprocessable Entity error
