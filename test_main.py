@@ -114,3 +114,57 @@ def test_create_pattern_boundary_zero_fabric_count():
     }
     response = client.post("/patterns", json=payload)
     assert response.status_code == 422  # Unprocessable Entity error
+
+def test_create_pattern_with_valid_colors():
+    """
+    Cycle 1 (EP - Valid Partition): Checks that a pattern containing a standard list
+    of 5 valid color strings successfully catalogs with a 201 status code.
+    """
+    payload = {
+        "title": "Enchanted Forest",
+        "designer": "Barbara Ana",
+        "fabric_count": 14,
+        "grid_width": 120,
+        "grid_height": 140,
+        "colors": ["DMC 310", "DMC 666", "DMC 700", "DMC 939", "DMC White"]
+    }
+    response = client.post("/patterns", json=payload)
+    assert response.status_code == 201
+    assert "colors" in response.json()
+    assert len(response.json()["colors"]) == 5
+
+def test_create_pattern_maximum_boundary_colors():
+    """
+    Cycle 2 (BVA - Maximum Boundary): Verifies that a pattern containing exactly
+    20 colors (the maximum allowable limit constraint rule) passes successfully.
+    """
+    twenty_colors = [f"DMC Color {i}" for i in range(1, 21)]  # Generates 20 items
+    payload = {
+        "title": "Massive Masterpiece",
+        "designer": "Long Dog Sampler",
+        "fabric_count": 18,
+        "grid_width": 300,
+        "grid_height": 300,
+        "colors": twenty_colors
+    }
+    response = client.post("/patterns", json=payload)
+    assert response.status_code == 201
+    assert len(response.json()["colors"]) == 20
+
+def test_create_pattern_invalid_max_colors_violation():
+    """
+    Cycle 3 (BVA - Out-of-Bounds): Verifies that trying to add a pattern with 21 colors 
+    violates our maximum limit rule and is rejected with a 422 Unprocessable Content error.
+    """
+    twenty_one_colors = [f"DMC Color {i}" for i in range(1, 22)]  # Generates 21 items
+    payload = {
+        "title": "Too Many Colors",
+        "designer": "Stitch Wizards",
+        "fabric_count": 14,
+        "grid_width": 100,
+        "grid_height": 100,
+        "colors": twenty_one_colors
+    }
+    response = client.post("/patterns", json=payload)
+    # This assertion WILL fail because our API currently returns a 201 instead of a 422!
+    assert response.status_code == 422

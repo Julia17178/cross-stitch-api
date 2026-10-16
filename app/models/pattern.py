@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, ConfigDict
-
+from typing import List
 class PatternBase(BaseModel):
     # Defensive Guardrail: instantly rejects unexpected payload fields from the frontend
     model_config = ConfigDict(extra="forbid")
@@ -11,10 +11,14 @@ class PatternBase(BaseModel):
     grid_height: int = Field(..., gt=0, description="Total stitch height count down the vertical grid.", examples=[200])
 
 class PatternCreate(PatternBase):
-    pass
+    colors: List[str] = Field(default=[], max_items=20, description="List of pattern thread colors up to a maximum of 20 items.")
+
+
 
 class PatternUpdate(PatternBase):
     pass
 
 class PatternResponse(PatternBase):
     id: int = Field(..., description="Application-assigned internal pattern identifier key.")
+    colors: List[str] = []
+
