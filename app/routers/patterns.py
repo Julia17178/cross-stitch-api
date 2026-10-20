@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
 from typing import List
 from app.database import db_patterns, pattern_id_counter
-from app.models.pattern import PatternCreate, PatternUpdate, PatternResponse
+from app.schemas.pattern import PatternCreate, PatternUpdate, PatternResponse
+
 
 # Adjusted tag to match lowercase "patterns" defined in your app/main.py metadata
 router = APIRouter(prefix="/patterns", tags=["patterns"])
