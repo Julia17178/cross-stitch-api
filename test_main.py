@@ -6,12 +6,12 @@ from app.database import db_patterns
 # Initialize the programmatic FastAPI testing client execution engine
 client = TestClient(app)
 
-# ==============================================================================
+
 # TEST DOUBLE JUSTIFICATION (Rubric Requirement):
 # This test suite utilizes an in-memory dictionary mock (`db_patterns`) as a 
 # test double instead of connecting to a live, external production database. 
 # This isolates the unit tests and ensures rapid, side-effect-free execution loops.
-# ==============================================================================
+
 
 @pytest.fixture(autouse=True)
 def clear_mock_database():
@@ -168,3 +168,31 @@ def test_create_pattern_invalid_max_colors_violation():
     response = client.post("/patterns", json=payload)
     # This assertion WILL fail because our API currently returns a 201 instead of a 422!
     assert response.status_code == 422
+
+# FUNCTIONAL TEST: Checks if listing works and returns 200 OK
+def test_hw6_list_all_patterns_functional():
+    seed_payload = {
+        "title": "Autumn Leaf",
+        "designer": "Barbara Ana",
+        "fabric_count": 14,
+        "grid_width": 100,
+        "grid_height": 100
+    }
+    client.post("/patterns", json=seed_payload)
+    response = client.get("/patterns")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+# NFR PERFORMANCE TEST
+# THRESHOLD: The API must complete a batch loop of 10 list requests in under 100ms.
+def test_hw6_list_patterns_load_performance_threshold():
+    start_time = time.time()
+    
+    for _ in range(10):
+        response = client.get("/patterns")
+        assert response.status_code == 200
+        
+    end_time = time.time()
+    total_elapsed_ms = (end_time - start_time) * 1000
+    
+    assert total_elapsed_ms < 100, f"Failed: Took {total_elapsed_ms:.2f}ms"
