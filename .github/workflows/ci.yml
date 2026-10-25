@@ -1,0 +1,35 @@
+# TERM: WORKFLOW
+name: Cross-Stitch API Automation Pipeline
+
+# TERM: EVENT (TRIGGER)
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  # TERM: JOB
+  execute-testing-suite:
+    
+    # TERM: RUNNER
+    runs-on: ubuntu-latest
+
+    steps:
+      # TERM: STEP (This step uses an ACTION)
+      - name: Check out the repository code layers
+        uses: actions/checkout@v4
+
+      # TERM: STEP (This step uses an ACTION)
+      - name: Configure the Python runtime environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # TERM: STEP
+      - name: Install required application dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install fastapi uvicorn pytest requests httpx
+
+      # TERM: STEP
+      - name: Run automated validation loops
+        run: pytest test_main.py
