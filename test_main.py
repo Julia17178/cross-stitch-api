@@ -197,3 +197,8 @@ def test_hw6_list_patterns_load_performance_threshold():
     total_elapsed_ms = (end_time - start_time) * 1000
     
     assert total_elapsed_ms < 100, f"Failed: Took {total_elapsed_ms:.2f}ms"
+
+def test_fabric_calculator_is_hidden_by_default():
+    response = client.get("/patterns/fabric-calculator")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Feature flag 'ENABLE_FABRIC_CALCULATOR' is disabled."
