@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from app.routers import patterns
 
 app = FastAPI(
@@ -8,10 +8,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# 🚩 FEATURE FLAG DEFINITION: Defaults to False (Disabled)
 ENABLE_FABRIC_CALCULATOR = os.getenv("ENABLE_FABRIC_CALCULATOR", "false").lower() == "true"
 
-# Connect your patterns router layer
 app.include_router(patterns.router)
 
 @app.get("/health", tags=["health"], summary="Health Check")
@@ -21,3 +19,10 @@ def health_check():
         "message": "Confirm that the API process is running.", 
         "fabric_calculator_enabled": ENABLE_FABRIC_CALCULATOR
     }
+
+@app.get("/patterns/fabric-calculator", tags=["calculator"], summary="Calculate Required Fabric Size")
+def get_fabric_calculation():
+    if not ENABLE_FABRIC_CALCULATOR:
+        raise HTTPException(status_code=404, detail="Feature flag 'ENABLE_FABRIC_CALCULATOR' is disabled.")
+    
+    return {"message": "Fabric canvas calculator functionality coming soon!"}
