@@ -9,6 +9,7 @@ app = FastAPI(
 )
 
 ENABLE_FABRIC_CALCULATOR = os.getenv("ENABLE_FABRIC_CALCULATOR", "false").lower() == "true"
+ENABLE_STITCH_TIMER = os.getenv("ENABLE_STITCH_TIMER", "false").lower() == "true"
 
 app.include_router(patterns.router)
 
@@ -17,7 +18,8 @@ def health_check():
     return {
         "status": "healthy", 
         "message": "Confirm that the API process is running.", 
-        "fabric_calculator_enabled": ENABLE_FABRIC_CALCULATOR
+        "fabric_calculator_enabled": ENABLE_FABRIC_CALCULATOR,
+        "stitch_timer_enabled": ENABLE_STITCH_TIMER
     }
 
 @app.get("/patterns/fabric-calculator", tags=["calculator"], summary="Calculate Required Fabric Size")
