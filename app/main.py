@@ -28,3 +28,10 @@ def get_fabric_calculation():
         raise HTTPException(status_code=404, detail="Feature flag 'ENABLE_FABRIC_CALCULATOR' is disabled.")
     
     return {"message": "Fabric canvas calculator functionality coming soon!"}
+
+@app.get("/patterns/stitch-timer", tags=["timer"], summary="Estimate Project Completion Time")
+def get_stitch_timer():
+    if not ENABLE_STITCH_TIMER:
+        raise HTTPException(status_code=404, detail="Feature flag 'ENABLE_STITCH_TIMER' is disabled.")
+
+    return {"message": "Stitch completion timer functionality coming soon!"}
