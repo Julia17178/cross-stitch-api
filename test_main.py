@@ -202,3 +202,8 @@ def test_fabric_calculator_is_hidden_by_default():
     response = client.get("/patterns/fabric-calculator")
     assert response.status_code == 404
     assert response.json()["detail"] == "Feature flag 'ENABLE_FABRIC_CALCULATOR' is disabled."
+
+def test_stitch_timer_disabled_by_default():
+    response = client.get("/patterns/stitch-timer")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Feature flag 'ENABLE_STITCH_TIMER' is disabled."}
