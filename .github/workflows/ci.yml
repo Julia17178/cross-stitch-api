@@ -28,3 +28,22 @@ jobs:
 
       - name: Run automated validation loops
         run: pytest test_main.py
+
+  deploy:
+    needs: execute-testing-suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy build to blue and green S3 prefixes
+        run: |
+          aws s3 sync ./app s3://${{ secrets.S3_BUCKET }}/julia17178/blue/
+          aws s3 sync ./app s3://${{ secrets.S3_BUCKET }}/julia17178/green/
